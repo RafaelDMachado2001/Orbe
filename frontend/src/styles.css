@@ -1,0 +1,120 @@
+@import 'tailwindcss';
+
+/*
+ * Identidade visual do Verso Finanças. Nenhum componente declara cor crua:
+ * tudo sai destes tokens, que o Tailwind 4 transforma em utilitarios
+ * (bg-app, text-ink, border-hairline, text-green, ...).
+ */
+@theme {
+  --color-app: #08090c;
+  --color-surface: #0f1216;
+  --color-surface-alt: #12151b;
+  --color-surface-raised: #101318;
+
+  --color-hairline: rgba(255, 255, 255, 0.07);
+  --color-hairline-soft: rgba(255, 255, 255, 0.045);
+  --color-hairline-strong: rgba(255, 255, 255, 0.18);
+
+  --color-ink: #e9ecf1;
+  --color-ink-soft: #98a0ab;
+  --color-ink-muted: #6e7681;
+  --color-ink-faint: #5c636d;
+  --color-ink-dim: #737b86;
+
+  --color-green: #35d68a;
+  --color-green-light: #48e39a;
+  --color-green-bright: #6fe7ac;
+  --color-green-deep: #1d9260;
+
+  --color-purple: #a07cff;
+  --color-purple-light: #c9b4ff;
+  --color-purple-deep: #4a2a7a;
+
+  --color-orange: #ff8a3d;
+  --color-orange-light: #ffa76b;
+  --color-orange-deep: #b45a22;
+
+  --color-danger: #f4515f;
+
+  --font-sans: 'Manrope', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --radius-card: 18px;
+  --radius-panel: 16px;
+  --radius-control: 11px;
+  --radius-chip: 10px;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-app);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Foco sempre visivel, em roxo, sobre qualquer superficie. */
+  :focus-visible {
+    outline: 2px solid var(--color-purple);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  /* Modo privacidade: borra todo valor monetario sem tirar do fluxo. */
+  .privacy-blur {
+    filter: blur(7px);
+    user-select: none;
+  }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.04) 25%,
+      rgba(255, 255, 255, 0.08) 37%,
+      rgba(255, 255, 255, 0.04) 63%
+    );
+    background-size: 400% 100%;
+    animation: skeleton-sweep 1.4s ease infinite;
+  }
+
+  @keyframes skeleton-sweep {
+    0% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0 50%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton {
+      animation: none;
+    }
+  }
+}

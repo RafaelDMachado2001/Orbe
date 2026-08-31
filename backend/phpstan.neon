@@ -1,0 +1,19 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 6
+
+    paths:
+        - app
+        - database
+        - routes
+        - tests
+
+    ignoreErrors:
+        # O $this dos testes Pest e o TestCase montado em tempo de execucao;
+        # o PHPStan enxerga o PHPUnit\Framework\TestCase cru.
+        - identifier: property.notFound
+          path: tests/*
+        - identifier: method.notFound
+          path: tests/*

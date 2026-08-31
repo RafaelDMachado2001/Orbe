@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+    <php>
+        <!--
+            As variaveis vao em <server>, nao em <env>.
+            O Env do Laravel consulta $_SERVER antes de $_ENV, e dentro do
+            container o docker-compose ja preencheu os dois. Usar apenas <env>
+            faria a suite rodar no banco de desenvolvimento.
+        -->
+        <server name="APP_ENV" value="testing" force="true"/>
+        <server name="APP_MAINTENANCE_DRIVER" value="file" force="true"/>
+        <server name="BCRYPT_ROUNDS" value="4" force="true"/>
+        <server name="BROADCAST_CONNECTION" value="null" force="true"/>
+        <server name="CACHE_STORE" value="array" force="true"/>
+
+        <!--
+            A suite roda em Postgres: o schema usa coluna gerada e as
+            agregacoes mensais usam TO_CHAR, que o SQLite nao conhece.
+        -->
+        <server name="DB_CONNECTION" value="pgsql" force="true"/>
+        <server name="DB_DATABASE" value="verso_financas_test" force="true"/>
+
+        <server name="MAIL_MAILER" value="array" force="true"/>
+        <server name="QUEUE_CONNECTION" value="sync" force="true"/>
+        <server name="SESSION_DRIVER" value="array" force="true"/>
+
+        <env name="APP_ENV" value="testing" force="true"/>
+        <env name="DB_DATABASE" value="verso_financas_test" force="true"/>
+    </php>
+</phpunit>
