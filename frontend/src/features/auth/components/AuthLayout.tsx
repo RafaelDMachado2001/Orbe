@@ -14,7 +14,7 @@ export function AuthLayout({ title, subtitle, children, footer }: Props) {
         <div className="w-full max-w-[380px]">
           <div className="mb-8 flex items-center gap-[11px]">
             <div className="grid size-[34px] place-items-center rounded-[11px] bg-[linear-gradient(140deg,#35D68A,#1E9E63)] text-[15px] font-extrabold text-[#04140C]">
-              V
+              O
             </div>
             <div className="flex flex-col gap-px">
               <span className="text-[14.5px] font-bold tracking-[-0.2px]">Orbe</span>
@@ -44,9 +44,8 @@ export function AuthLayout({ title, subtitle, children, footer }: Props) {
         />
 
         <div className="relative flex h-full flex-col justify-center gap-5 px-16">
-          <p className="max-w-[26ch] text-[30px] font-extrabold leading-[1.15] tracking-[-1px]">
-            Onde seu dinheiro está <span className="text-green">hoje</span> e onde estará em{' '}
-            <span className="text-purple">setembro</span>.
+          <p className="max-w-[26ch] text-[40px] font-extrabold leading-[1.15] tracking-[-1px]">
+            Onde seu dinheiro está <span className="text-purple">hoje</span>
           </p>
           <p className="max-w-[42ch] text-[13px] leading-relaxed text-ink-soft">
             Saldo consolidado, faturas de cartão, parcelas em aberto e uma projeção construída a
