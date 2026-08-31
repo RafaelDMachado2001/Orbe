@@ -1,4 +1,4 @@
-# Verso Finanças
+# Orbe
 
 App de controle financeiro pessoal/PJ. **Laravel 12 como API** + **React 18 + TypeScript** como SPA, **PostgreSQL** como banco, tudo orquestrado por **Docker Compose**.
 
@@ -445,7 +445,7 @@ Um `401` da API dispara um evento que limpa o token e devolve a SPA para a tela 
 make test
 ```
 
-Pest sobre PostgreSQL — a suíte não roda em SQLite porque o schema usa coluna gerada e as agregações mensais usam `TO_CHAR`. A base de teste (`verso_financas_test`) é criada no primeiro boot do container do Postgres.
+Pest sobre PostgreSQL — a suíte não roda em SQLite porque o schema usa coluna gerada e as agregações mensais usam `TO_CHAR`. A base de teste (`orbe_test`) é criada no primeiro boot do container do Postgres.
 
 Cobertura: **toda Action de cálculo tem teste** (parcelamento, pagamento e fechamento de fatura, transferência, projeção, divisão de centavos) e cada endpoint tem feature test de caminho feliz, autorização, validação e isolamento entre usuários.
 

@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 /*
- * Identidade visual do Verso Finanças. Nenhum componente declara cor crua:
+ * Identidade visual do Orbe. Nenhum componente declara cor crua:
  * tudo sai destes tokens, que o Tailwind 4 transforma em utilitarios
  * (bg-app, text-ink, border-hairline, text-green, ...).
  */

@@ -2,7 +2,7 @@ import axios, { AxiosError, type AxiosInstance } from 'axios'
 
 import type { ApiValidationError } from '@/types/api'
 
-const TOKEN_KEY = 'verso.token'
+const TOKEN_KEY = 'orbe.token'
 
 export function getStoredToken(): string | null {
   return localStorage.getItem(TOKEN_KEY)
@@ -39,7 +39,7 @@ api.interceptors.request.use((config) => {
 })
 
 /** Evento emitido quando a API recusa o token, para o app voltar ao login. */
-export const UNAUTHORIZED_EVENT = 'verso:unauthorized'
+export const UNAUTHORIZED_EVENT = 'orbe:unauthorized'
 
 api.interceptors.response.use(
   (response) => response,

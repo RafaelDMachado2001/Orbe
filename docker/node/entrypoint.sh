@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-STAMP=/app/node_modules/.verso-install-stamp
+STAMP=/app/node_modules/.orbe-install-stamp
 
 if [ ! -f "$STAMP" ] || [ /app/package.json -nt "$STAMP" ]; then
     echo "[entrypoint:web] instalando dependencias npm..."

@@ -7,7 +7,7 @@ log() { printf '\033[36m[entrypoint:%s]\033[0m %s\n' "$ROLE" "$1"; }
 
 wait_for_postgres() {
     log "aguardando o postgres em ${DB_HOST:-postgres}:${DB_PORT:-5432}..."
-    until pg_isready -h "${DB_HOST:-postgres}" -p "${DB_PORT:-5432}" -U "${DB_USERNAME:-verso}" -q; do
+    until pg_isready -h "${DB_HOST:-postgres}" -p "${DB_PORT:-5432}" -U "${DB_USERNAME:-orbe}" -q; do
         sleep 1
     done
     log "postgres pronto."

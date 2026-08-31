@@ -17,7 +17,7 @@ export function AuthLayout({ title, subtitle, children, footer }: Props) {
               V
             </div>
             <div className="flex flex-col gap-px">
-              <span className="text-[14.5px] font-bold tracking-[-0.2px]">Verso Finanças</span>
+              <span className="text-[14.5px] font-bold tracking-[-0.2px]">Orbe</span>
               <span className="text-[11px] font-medium text-ink-muted">Controle financeiro</span>
             </div>
           </div>

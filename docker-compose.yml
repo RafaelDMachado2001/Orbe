@@ -1,4 +1,4 @@
-name: verso-financas
+name: orbe
 
 x-php-common: &php-common
   build:
@@ -7,7 +7,7 @@ x-php-common: &php-common
     args:
       UID: ${UID:-1000}
       GID: ${GID:-1000}
-  image: verso-financas/php:8.3
+  image: orbe/php:8.3
   user: "${UID:-1000}:${GID:-1000}"
   working_dir: /var/www/html
   volumes:
@@ -21,15 +21,15 @@ x-php-common: &php-common
     redis:
       condition: service_healthy
   networks:
-    - verso
+    - orbe
 
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: verso-postgres
+    container_name: orbe-postgres
     environment:
-      POSTGRES_DB: ${DB_DATABASE:-verso_financas}
-      POSTGRES_USER: ${DB_USERNAME:-verso}
+      POSTGRES_DB: ${DB_DATABASE:-orbe}
+      POSTGRES_USER: ${DB_USERNAME:-orbe}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
@@ -38,16 +38,16 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./docker/postgres/init-test-db.sh:/docker-entrypoint-initdb.d/10-init-test-db.sh:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-verso} -d ${DB_DATABASE:-verso_financas}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-orbe} -d ${DB_DATABASE:-orbe}"]
       interval: 5s
       timeout: 5s
       retries: 20
     networks:
-      - verso
+      - orbe
 
   redis:
     image: redis:7-alpine
-    container_name: verso-redis
+    container_name: orbe-redis
     command: ["redis-server", "--appendonly", "yes"]
     ports:
       - "${REDIS_FORWARD_PORT:-6380}:6379"
@@ -59,17 +59,17 @@ services:
       timeout: 3s
       retries: 20
     networks:
-      - verso
+      - orbe
 
   api:
     <<: *php-common
-    container_name: verso-api
+    container_name: orbe-api
     environment:
       CONTAINER_ROLE: app
 
   queue:
     <<: *php-common
-    container_name: verso-queue
+    container_name: orbe-queue
     environment:
       CONTAINER_ROLE: queue
     command: ["php", "artisan", "queue:work", "--tries=3", "--max-time=3600"]
@@ -83,7 +83,7 @@ services:
 
   scheduler:
     <<: *php-common
-    container_name: verso-scheduler
+    container_name: orbe-scheduler
     environment:
       CONTAINER_ROLE: scheduler
     command: ["php", "artisan", "schedule:work"]
@@ -97,7 +97,7 @@ services:
 
   nginx:
     image: nginx:1.27-alpine
-    container_name: verso-nginx
+    container_name: orbe-nginx
     ports:
       - "${API_FORWARD_PORT:-8000}:80"
     volumes:
@@ -106,7 +106,7 @@ services:
     depends_on:
       - api
     networks:
-      - verso
+      - orbe
 
   web:
     build:
@@ -115,8 +115,8 @@ services:
       args:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
-    image: verso-financas/node:22
-    container_name: verso-web
+    image: orbe/node:22
+    container_name: orbe-web
     user: "${UID:-1000}:${GID:-1000}"
     working_dir: /app
     environment:
@@ -128,7 +128,7 @@ services:
       - ./frontend:/app
       - node-modules:/app/node_modules
     networks:
-      - verso
+      - orbe
 
 volumes:
   postgres-data:
@@ -137,5 +137,5 @@ volumes:
   node-modules:
 
 networks:
-  verso:
+  orbe:
     driver: bridge

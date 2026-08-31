@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 
 import { PrivacyContext, type PrivacyContextValue } from './privacy-context'
 
-const STORAGE_KEY = 'verso.privacy'
+const STORAGE_KEY = 'orbe.privacy'
 
 /**
  * Modo privacidade: borra todos os valores da tela. Atalho Shift+H, para
