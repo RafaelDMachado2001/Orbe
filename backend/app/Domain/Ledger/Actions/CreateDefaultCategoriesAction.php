@@ -37,15 +37,27 @@ final class CreateDefaultCategoriesAction
             'icon' => 'landmark',
             'system_key' => SystemCategory::Emprestimos,
         ],
+        [
+            'name' => 'Ajuste de saldo',
+            'color' => '#6E7681',
+            'icon' => 'scale',
+            'system_key' => SystemCategory::AjusteSaida,
+        ],
         ['name' => 'Outros', 'color' => '#4A525E', 'icon' => 'circle-dashed'],
     ];
 
-    /** @var list<array{name: string, color: string, icon: string}> */
+    /** @var list<array{name: string, color: string, icon: string, system_key?: SystemCategory}> */
     private const INCOMES = [
         ['name' => 'Salário', 'color' => '#35D68A', 'icon' => 'wallet'],
         ['name' => 'Serviços PJ', 'color' => '#48E39A', 'icon' => 'briefcase'],
         ['name' => 'Aluguel recebido', 'color' => '#1D9260', 'icon' => 'key'],
         ['name' => 'Rendimentos', 'color' => '#6FE7AC', 'icon' => 'trending-up'],
+        [
+            'name' => 'Ajuste de saldo',
+            'color' => '#6E7681',
+            'icon' => 'scale',
+            'system_key' => SystemCategory::AjusteEntrada,
+        ],
         ['name' => 'Outras receitas', 'color' => '#4A525E', 'icon' => 'circle-plus'],
     ];
 

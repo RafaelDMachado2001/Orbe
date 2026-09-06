@@ -56,7 +56,7 @@ export function Modal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/65 p-6 backdrop-blur-[2px]"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/65 p-0 backdrop-blur-[2px] sm:p-6"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
           onClose()
@@ -68,11 +68,11 @@ export function Modal({
         aria-modal="true"
         aria-label={title}
         className={cn(
-          'my-auto w-full max-w-[560px] rounded-[18px] border border-hairline-strong bg-surface shadow-[0_28px_70px_rgba(0,0,0,0.6)]',
+          'flex h-full w-full flex-col rounded-none border-0 bg-surface shadow-[0_28px_70px_rgba(0,0,0,0.6)] sm:my-auto sm:h-auto sm:max-w-[560px] sm:rounded-[18px] sm:border sm:border-hairline-strong',
           className,
         )}
       >
-        <header className="flex items-start gap-4 border-b border-hairline px-[22px] py-[18px]">
+        <header className="flex shrink-0 items-start gap-4 border-b border-hairline px-[22px] py-[18px]">
           <div>
             <h2 className="text-[15px] font-bold tracking-[-0.2px] text-ink">{title}</h2>
             {subtitle ? (
@@ -89,10 +89,10 @@ export function Modal({
           </button>
         </header>
 
-        <div className="px-[22px] py-[18px]">{children}</div>
+        <div className="flex-1 overflow-y-auto px-[22px] py-[18px] sm:flex-none">{children}</div>
 
         {footer ? (
-          <footer className="flex items-center justify-end gap-2.5 border-t border-hairline px-[22px] py-[15px]">
+          <footer className="flex shrink-0 items-center justify-end gap-2.5 border-t border-hairline px-[22px] py-[15px]">
             {footer}
           </footer>
         ) : null}

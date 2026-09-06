@@ -2,7 +2,14 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\AccountController;
+use App\Http\Controllers\Api\V1\AccountOptionsController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\BankController;
+use App\Http\Controllers\Api\V1\BudgetController;
+use App\Http\Controllers\Api\V1\GoalContributionController;
+use App\Http\Controllers\Api\V1\GoalController;
+use App\Http\Controllers\Api\V1\ForecastController;
 use App\Http\Controllers\Api\V1\CardOptionsController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\CreditCardController;
@@ -11,6 +18,7 @@ use App\Http\Controllers\Api\V1\ImportController;
 use App\Http\Controllers\Api\V1\InvoiceController;
 use App\Http\Controllers\Api\V1\RecurrenceController;
 use App\Http\Controllers\Api\V1\RecurrenceOptionsController;
+use App\Http\Controllers\Api\V1\ReportController;
 use App\Http\Controllers\Api\V1\TransactionController;
 use App\Http\Controllers\Api\V1\TransactionOptionsController;
 use App\Http\Controllers\Api\V1\TransactionStatusController;
@@ -36,6 +44,32 @@ Route::prefix('v1')->group(function (): void {
         Route::post('auth/logout', [AuthController::class, 'logout']);
 
         Route::get('dashboard', DashboardController::class);
+        Route::get('forecast', ForecastController::class);
+
+        Route::get('reports/annual', [ReportController::class, 'annual']);
+        Route::get('reports/annual/export', [ReportController::class, 'exportAnnual']);
+
+        // "options" antes de "{account}", senao a rota curinga tentaria
+        // carregar uma conta de id "options".
+        Route::get('accounts/options', AccountOptionsController::class);
+        Route::patch('accounts/{account}/archive', [AccountController::class, 'archive']);
+        Route::post('accounts/{account}/adjustments', [AccountController::class, 'adjust']);
+
+        Route::get('accounts', [AccountController::class, 'index']);
+        Route::post('accounts', [AccountController::class, 'store']);
+        Route::get('accounts/{account}', [AccountController::class, 'show']);
+        Route::put('accounts/{account}', [AccountController::class, 'update']);
+        Route::delete('accounts/{account}', [AccountController::class, 'destroy']);
+
+        Route::post('banks', [BankController::class, 'store']);
+        Route::put('banks/{bank}', [BankController::class, 'update']);
+        Route::delete('banks/{bank}', [BankController::class, 'destroy']);
+        Route::apiResource('budgets', BudgetController::class)->only(['index','store','update','destroy']);
+        Route::apiResource('goals', GoalController::class)->only(['index','store','update','destroy']);
+        Route::patch('goals/{goal}/archive', [GoalController::class, 'archive']);
+        Route::get('goals/{goal}/contributions', [GoalContributionController::class, 'index']);
+        Route::post('goals/{goal}/contributions', [GoalContributionController::class, 'store']);
+        Route::delete('goals/{goal}/contributions/{contribution}', [GoalContributionController::class, 'destroy']);
 
         Route::get('categories', [CategoryController::class, 'index']);
         Route::post('categories', [CategoryController::class, 'store']);

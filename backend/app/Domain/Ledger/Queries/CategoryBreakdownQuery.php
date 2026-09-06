@@ -11,8 +11,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Gastos por categoria em um mes, somando lancamentos de conta e parcelas de
- * cartao na mesma regra usada pela MonthlyTotalsQuery.
+ * Gastos por categoria em um periodo, somando lancamentos de conta e parcelas
+ * de cartao na mesma regra usada pela MonthlyTotalsQuery.
  *
  * @phpstan-type CategorySlice array{
  *     category_id: int|null,
@@ -25,23 +25,34 @@ use Illuminate\Support\Facades\DB;
 final class CategoryBreakdownQuery
 {
     /**
-     * Total gasto por categoria, sem recorte nem agrupamento em "Outros".
-     * Usado tambem pelo acompanhamento de orcamento.
+     * Total gasto por categoria em um unico mes, sem recorte nem agrupamento
+     * em "Outros". Usado tambem pelo acompanhamento de orcamento.
      *
      * @return array<int|string, array<string, mixed>>
      */
     public function totalsByCategory(int $userId, CarbonImmutable $month): array
     {
-        $start = $month->startOfMonth()->toDateString();
-        $end = $month->endOfMonth()->toDateString();
+        return $this->totalsByCategoryBetween($userId, $month, $month);
+    }
+
+    /**
+     * Mesma soma, mas para um intervalo de meses — o relatorio anual precisa
+     * do ano inteiro, nao so um mes.
+     *
+     * @return array<int|string, array<string, mixed>>
+     */
+    public function totalsByCategoryBetween(int $userId, CarbonImmutable $start, CarbonImmutable $end): array
+    {
+        $startDate = $start->startOfMonth()->toDateString();
+        $endDate = $end->endOfMonth()->toDateString();
 
         $buckets = [];
 
-        foreach ($this->accountExpenses($userId, $start, $end) as $row) {
+        foreach ($this->accountExpenses($userId, $startDate, $endDate) as $row) {
             $this->add($buckets, $row);
         }
 
-        foreach ($this->cardExpenses($userId, $start, $end) as $row) {
+        foreach ($this->cardExpenses($userId, $startDate, $endDate) as $row) {
             $this->add($buckets, $row);
         }
 
@@ -51,8 +62,21 @@ final class CategoryBreakdownQuery
     /** @return list<CategorySlice> ordenado do maior gasto para o menor */
     public function handle(int $userId, CarbonImmutable $month, int $limit = 6): array
     {
-        $buckets = $this->totalsByCategory($userId, $month);
+        return $this->rank($this->totalsByCategory($userId, $month), $limit);
+    }
 
+    /** @return list<CategorySlice> ordenado do maior gasto para o menor */
+    public function handleBetween(int $userId, CarbonImmutable $start, CarbonImmutable $end, int $limit = 12): array
+    {
+        return $this->rank($this->totalsByCategoryBetween($userId, $start, $end), $limit);
+    }
+
+    /**
+     * @param  array<int|string, array<string, mixed>>  $buckets
+     * @return list<CategorySlice>
+     */
+    private function rank(array $buckets, int $limit): array
+    {
         $grandTotal = array_sum(array_column($buckets, 'total'));
 
         usort($buckets, static fn (array $a, array $b): int => $b['total'] <=> $a['total']);

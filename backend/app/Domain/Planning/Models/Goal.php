@@ -11,6 +11,7 @@ use Database\Factories\GoalFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
@@ -18,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $account_id
  * @property string $name
  * @property string $target_amount
- * @property string $current_amount
+ * @property string $initial_amount
  * @property CarbonImmutable|null $deadline
  * @property bool $is_archived
  */
@@ -32,7 +33,7 @@ class Goal extends Model
         'account_id',
         'name',
         'target_amount',
-        'current_amount',
+        'initial_amount',
         'deadline',
         'is_archived',
     ];
@@ -42,7 +43,7 @@ class Goal extends Model
     {
         return [
             'target_amount' => 'decimal:2',
-            'current_amount' => 'decimal:2',
+            'initial_amount' => 'decimal:2',
             'deadline' => 'immutable_date',
             'is_archived' => 'boolean',
         ];
@@ -54,6 +55,22 @@ class Goal extends Model
         return $this->belongsTo(Account::class);
     }
 
+    /** @return HasMany<GoalContribution, $this> */
+    public function contributions(): HasMany
+    {
+        return $this->hasMany(GoalContribution::class);
+    }
+
+    /**
+     * Valor atual: nunca editado direto, so o saldo inicial informado na
+     * criacao mais a soma de todos os aportes — o mesmo raciocinio do saldo
+     * de conta, que tambem nunca e um numero guardado e sim calculado.
+     */
+    public function currentAmount(): float
+    {
+        return round((float) $this->initial_amount + (float) $this->contributions()->sum('amount'), 2);
+    }
+
     /** Percentual atingido, limitado a 100. */
     public function progress(): float
     {
@@ -63,6 +80,6 @@ class Goal extends Model
             return 0.0;
         }
 
-        return round(min(((float) $this->current_amount / $target) * 100, 100), 2);
+        return round(min(($this->currentAmount() / $target) * 100, 100), 2);
     }
 }

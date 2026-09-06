@@ -23,18 +23,19 @@ const groups: NavGroup[] = [
       { label: 'Visão geral', to: '/' },
       { label: 'Lançamentos', to: '/lancamentos' },
       { label: 'Cartões', to: '/cartoes' },
-      { label: 'Bancos e contas', to: '/bancos', disabled: true },
+      { label: 'Bancos e contas', to: '/bancos' },
       { label: 'Despesas fixas', to: '/recorrencias' },
       { label: 'Categorias', to: '/categorias' },
       { label: 'Importar histórico', to: '/importar' },
+      { label: 'Orçamentos', to: '/orcamentos' },
     ],
   },
   {
     title: 'Inteligência',
     items: [
-      { label: 'Previsão financeira', to: '/previsao', disabled: true },
-      { label: 'Relatórios', to: '/relatorios', disabled: true },
-      { label: 'Metas e orçamento', to: '/metas', disabled: true },
+      { label: 'Previsão financeira', to: '/previsao' },
+      { label: 'Relatórios', to: '/relatorios' },
+      { label: 'Metas', to: '/metas' },
     ],
   },
 ]
@@ -43,11 +44,24 @@ interface SidebarProps {
   cardsCount?: number
   commitmentRate?: number | null
   nextMonthLabel?: string
+  isOpen: boolean
+  onClose: () => void
 }
 
-export function Sidebar({ cardsCount, commitmentRate, nextMonthLabel }: SidebarProps) {
+export function Sidebar({
+  cardsCount,
+  commitmentRate,
+  nextMonthLabel,
+  isOpen,
+  onClose,
+}: SidebarProps) {
   return (
-    <aside className="flex w-[248px] shrink-0 flex-col gap-7 border-r border-hairline bg-[linear-gradient(180deg,#0C0E12,#08090C)] px-[18px] py-[26px]">
+    <aside
+      className={cn(
+        'fixed inset-y-0 left-0 z-40 flex w-[248px] shrink-0 flex-col gap-7 border-r border-hairline bg-[linear-gradient(180deg,#0C0E12,#08090C)] px-[18px] py-[26px] transition-transform duration-200 ease-out lg:static lg:translate-x-0',
+        isOpen ? 'translate-x-0' : '-translate-x-full',
+      )}
+    >
       <div className="flex items-center gap-[11px] px-1.5">
         <div className="grid size-[34px] place-items-center rounded-[11px] bg-[linear-gradient(140deg,#35D68A,#1E9E63)] text-[15px] font-extrabold text-[#04140C]">
           V
@@ -75,6 +89,7 @@ export function Sidebar({ cardsCount, commitmentRate, nextMonthLabel }: SidebarP
                 key={item.to}
                 item={item}
                 badge={item.label === 'Cartões' ? cardsCount : undefined}
+                onNavigate={onClose}
               />
             ))}
           </div>
@@ -101,7 +116,15 @@ export function Sidebar({ cardsCount, commitmentRate, nextMonthLabel }: SidebarP
   )
 }
 
-function SidebarLink({ item, badge }: { item: NavItem; badge?: number }) {
+function SidebarLink({
+  item,
+  badge,
+  onNavigate,
+}: {
+  item: NavItem
+  badge?: number
+  onNavigate: () => void
+}) {
   const content = (isActive: boolean) => (
     <>
       <span
@@ -137,6 +160,7 @@ function SidebarLink({ item, badge }: { item: NavItem; badge?: number }) {
     <NavLink
       to={item.to}
       end
+      onClick={onNavigate}
       className={({ isActive }) =>
         cn(
           'flex items-center gap-[11px] rounded-[10px] px-3 py-2.5 text-[13.5px] transition-colors',

@@ -105,7 +105,7 @@ export function FilterBar({ controller, options }: Props) {
           onToggle={(value) => controller.toggle('statuses', value)}
         />
 
-        <div className="ml-auto flex flex-wrap items-center gap-2">
+        <div className="ml-auto flex w-full flex-wrap items-center gap-2 sm:w-auto">
           <Select
             aria-label="Filtrar por categoria"
             placeholder="Todas as categorias"
@@ -117,7 +117,7 @@ export function FilterBar({ controller, options }: Props) {
               value: category.id.toString(),
               label: category.name,
             }))}
-            className="w-[168px] py-2 text-[12px]"
+            className="w-full py-2 text-[12px] sm:w-[168px]"
           />
 
           <Select
@@ -131,7 +131,7 @@ export function FilterBar({ controller, options }: Props) {
               value: account.id.toString(),
               label: account.nickname,
             }))}
-            className="w-[150px] py-2 text-[12px]"
+            className="w-full py-2 text-[12px] sm:w-[150px]"
           />
 
           <Select
@@ -145,7 +145,7 @@ export function FilterBar({ controller, options }: Props) {
               value: card.id.toString(),
               label: card.nickname,
             }))}
-            className="w-[168px] py-2 text-[12px]"
+            className="w-full py-2 text-[12px] sm:w-[168px]"
           />
 
           {controller.isDirty ? (

@@ -27,7 +27,7 @@ interface CardHeaderProps {
 
 export function CardHeader({ title, subtitle, action, className }: CardHeaderProps) {
   return (
-    <div className={cn('flex items-start gap-4', className)}>
+    <div className={cn('flex flex-wrap items-start gap-4', className)}>
       <div>
         <h2 className="text-[14.5px] font-bold tracking-[-0.2px] text-ink">{title}</h2>
         {subtitle ? (

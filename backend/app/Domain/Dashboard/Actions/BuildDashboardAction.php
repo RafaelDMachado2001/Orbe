@@ -138,16 +138,27 @@ final class BuildDashboardAction
             ->all();
     }
 
-    /** Progresso agregado das metas ativas. */
+    /**
+     * Progresso agregado das metas ativas. O atual de cada meta e o inicial
+     * mais a soma dos aportes — o mesmo calculo de `Goal::currentAmount()`,
+     * so que em uma unica consulta para nao rodar uma por meta.
+     */
     private function goalProgress(int $userId): ?float
     {
-        $goals = DB::table('goals')
+        $perGoal = DB::table('goals')
+            ->leftJoin('goal_contributions', 'goal_contributions.goal_id', '=', 'goals.id')
             ->selectRaw(<<<'SQL'
-                SUM(target_amount)   AS target,
-                       SUM(current_amount)  AS current
+                goals.id                                                        AS id,
+                       MAX(goals.target_amount)                                 AS target_amount,
+                       MAX(goals.initial_amount) + COALESCE(SUM(goal_contributions.amount), 0) AS current
                 SQL)
-            ->where('user_id', $userId)
-            ->where('is_archived', false)
+            ->where('goals.user_id', $userId)
+            ->where('goals.is_archived', false)
+            ->groupBy('goals.id');
+
+        $goals = DB::query()
+            ->fromSub($perGoal, 'per_goal')
+            ->selectRaw('SUM(target_amount) AS target, SUM(current) AS current')
             ->first();
 
         $target = (float) ($goals->target ?? 0);

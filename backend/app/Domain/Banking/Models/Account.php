@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Domain\Banking\Models;
 
 use App\Domain\Banking\Enums\AccountType;
+use App\Domain\Ledger\Enums\TransactionStatus;
 use App\Domain\Ledger\Models\Transaction;
 use App\Support\Concerns\BelongsToUser;
 use App\Support\Scopes\UserScope;
+use Carbon\CarbonImmutable;
 use Database\Factories\AccountFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -93,6 +95,25 @@ class Account extends Model
             : $this->transactions()
                 ->where('status', 'confirmado')
                 ->sum('signed_amount');
+
+        return round((float) $this->initial_balance + (float) $movements, 2);
+    }
+
+    /**
+     * Saldo da conta no fim de um dia — saldo inicial mais os lancamentos
+     * confirmados ate ali.
+     *
+     * E o numero que a conciliacao compara com o extrato do banco: comparar
+     * com o saldo de hoje faria um ajuste datado no passado corrigir a
+     * diferenca errada.
+     */
+    public function balanceOn(CarbonImmutable $date): float
+    {
+        $movements = $this->transactions()
+            ->withoutUserScope()
+            ->where('status', TransactionStatus::Confirmado->value)
+            ->where('competence_date', '<=', $date->toDateString())
+            ->sum('signed_amount');
 
         return round((float) $this->initial_balance + (float) $movements, 2);
     }

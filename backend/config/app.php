@@ -56,6 +56,9 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    /** Onde o frontend mora — os e-mails de alerta linkam de volta pra la. */
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:5173'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

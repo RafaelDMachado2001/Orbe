@@ -22,7 +22,7 @@ class GoalFactory extends Factory
             'account_id' => null,
             'name' => 'Reserva de emergência',
             'target_amount' => 30000,
-            'current_amount' => fake()->randomFloat(2, 0, 30000),
+            'initial_amount' => fake()->randomFloat(2, 0, 30000),
             'deadline' => CarbonImmutable::now()->addYear()->toDateString(),
             'is_archived' => false,
         ];

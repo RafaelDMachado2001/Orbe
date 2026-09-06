@@ -223,6 +223,62 @@ vencimento recalcula as datas das faturas ainda em aberto, mas não move
 parcelas já alocadas: elas cairiam em outra fatura e o histórico deixaria de
 bater com o que o banco cobrou.
 
+### A tela de Bancos e contas
+
+**O agrupamento é por instituição.** "Quanto tenho no Nubank" vem antes de
+"quanto tenho na conta corrente", então cada banco é um bloco e as contas dele
+ficam dentro. O saldo do cabeçalho soma só as contas ativas do banco — a
+arquivada aparece na lista, apagada, mas não entra em total nenhum.
+
+**Saldo nunca é uma coluna.** Ele é sempre saldo inicial mais os lançamentos
+confirmados, agregado no banco por `Account::scopeWithCurrentBalance()`. Um
+campo `balance` materializado divergiria na primeira exclusão de lançamento que
+esquecesse de atualizá-lo.
+
+**O consolidado não se recalcula aqui.** Ele vem da `AccountsOverviewQuery`, a
+mesma que alimenta o KPI da Visão geral, e a evolução de seis meses parte do
+saldo na véspera da janela e vai somando o movimento de cada mês — uma consulta
+em vez de seis chamadas ao consolidado.
+
+**Entrou e saiu, não receita e despesa.** O movimento de cada conta soma tudo o
+que passou por ela, transferência inclusa: mandar dinheiro da corrente para a
+poupança não é despesa, mas é uma saída da corrente — e essa é a pergunta que a
+tela responde. Resultado do mês continua sendo assunto da Visão geral.
+
+**Catálogo de bancos, não tabela de bancos.** A tela oferece as instituições
+mais comuns já com nome, cor e tipo (`BankCatalog`), mas o registro criado é o
+mesmo de um banco digitado à mão. O catálogo existe para que a mesma
+instituição apareça com a mesma cor em todas as telas — a cor do banco pinta
+cartão, gráfico e lista, e "Nubank" roxo em uma tela e verde em outra atrapalha
+a leitura. A unicidade é conferida pelo *slug* do nome, então "Nubank",
+"nubank " e "NUBANK" são a mesma instituição. `BankKind::Carteira` existe para
+dinheiro em espécie: toda conta pertence a um banco, e a carteira física
+precisava de um lugar honesto.
+
+**O saldo inicial não se reescreve.** Ele é o ponto de partida do histórico:
+mudá-lo acertaria o número de hoje e, de carona, mudaria o saldo de todos os
+meses passados — inclusive os que a pessoa já conferiu — sem deixar nada
+explicando a mudança. A edição de conta o recusa (`prohibited`) e aponta para o
+**ajuste de saldo**.
+
+**Conciliar é um lançamento, não uma edição.** A pessoa informa o saldo que o
+banco mostra; a `AdjustAccountBalanceAction` calcula a diferença e a grava como
+receita ou despesa confirmada, na categoria de sistema `ajuste_entrada` ou
+`ajuste_saida`. Como a diferença é calculada no servidor contra o saldo **da
+data do ajuste**, dois envios iguais em sequência não dobram a correção — o
+segundo não encontra diferença e é recusado. E a correção fica no extrato, com
+data e observação, podendo ser desfeita como qualquer outro lançamento.
+
+**Conta com extrato não se exclui.** O cascade levaria os lançamentos e o outro
+lado de cada transferência. Excluir só passa em conta sem movimento algum, e
+mesmo aí três travas a mais: cartão que paga a fatura por ela, despesa fixa que
+lança nela e lote de importação que aponta para ela. Nenhuma dessas viria de
+cascade — a referência ficaria nula em silêncio, e a pessoa descobriria no mês
+seguinte. Para todo o resto, arquivar.
+
+**Banco só sai vazio.** Com conta ou cartão dentro, apagá-lo levaria faturas e
+extrato junto. A conta arquivada conta como uso: ela guarda histórico.
+
 ### A tela de Despesas fixas
 
 **A regra e o lançamento são coisas distintas.** A regra descreve o que se
@@ -471,6 +527,8 @@ Entregue nesta versão:
 - [x] Tela de **Visão geral** replicando a referência visual, com dados reais da API
 - [x] Tela de **Lançamentos**: extrato unificado com filtros, CRUD completo e mudança de status
 - [x] Tela de **Cartões**: limites, cadastro de cartão e faturas (detalhe, pagar, fechar, desfazer)
+- [x] Tela de **Bancos e contas**: instituições com catálogo, contas por banco, evolução do saldo,
+      arquivar e **ajuste de saldo** (conciliação com o extrato como lançamento)
 - [x] **Faturas inteligentes**: fechamento retroativo por convenção (agendado + preguiçoso) e antecipação manual
 - [x] **Parcelamento em conta e empréstimo**: N lançamentos por mês, valor por total ou por prestação
 - [x] Tela de **Despesas fixas**: regras de repetição e o ato de lançá-las no extrato
@@ -479,4 +537,4 @@ Entregue nesta versão:
       linha, sugestão de categoria, aviso de repetido e desfazer do lote
 - [x] CI (Pint, PHPStan 6, Pest, tsc, ESLint, build)
 
-Próximas telas: Bancos e contas, Relatórios, Previsão financeira, Metas e orçamento.
+Próximas telas: Relatórios, Previsão financeira, Metas e orçamento.

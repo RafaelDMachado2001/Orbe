@@ -14,6 +14,7 @@ use Carbon\CarbonImmutable;
  * Um orcamento estourado (>= 100%) vira alerta laranja no dashboard.
  *
  * @phpstan-type BudgetStatus array{
+ *     id: int,
  *     category_id: int,
  *     category: string,
  *     color: string,
@@ -50,6 +51,7 @@ final class BudgetStatusQuery
             $percentage = $limit > 0.0 ? round(($spent / $limit) * 100, 1) : 0.0;
 
             return [
+                'id' => $budget->id,
                 'category_id' => $budget->category_id,
                 'category' => $budget->category->name,
                 'color' => $budget->category->color,

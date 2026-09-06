@@ -58,7 +58,24 @@ export function RecurrenceList({
       {rows.length === 0 ? (
         <EmptyState title="Nada por aqui" description={emptyDescription} />
       ) : (
-        <div role="table" aria-label={title} className="text-[12.5px]">
+        <>
+          <div className="flex flex-col md:hidden">
+            {rows.map((row, index) => (
+              <RecurrenceCard
+                key={row.id}
+                row={row}
+                isPrivate={isPrivate}
+                isLast={index === rows.length - 1}
+                isLaunching={launchingId === row.id}
+                onLaunch={() => onLaunch(row)}
+                onEdit={() => onEdit(row)}
+                onToggle={(isActive) => onToggle(row, isActive)}
+                onDelete={() => onDelete(row)}
+              />
+            ))}
+          </div>
+
+          <div role="table" aria-label={title} className="hidden text-[12.5px] md:block">
           <div
             role="row"
             className={cn(
@@ -164,9 +181,107 @@ export function RecurrenceList({
               </span>
             </div>
           ))}
-        </div>
+          </div>
+        </>
       )}
     </Card>
+  )
+}
+
+interface RecurrenceCardProps {
+  row: RecurrenceRow
+  isPrivate: boolean
+  isLast: boolean
+  isLaunching: boolean
+  onLaunch: () => void
+  onEdit: () => void
+  onToggle: (isActive: boolean) => void
+  onDelete: () => void
+}
+
+function RecurrenceCard({
+  row,
+  isPrivate,
+  isLast,
+  isLaunching,
+  onLaunch,
+  onEdit,
+  onToggle,
+  onDelete,
+}: RecurrenceCardProps) {
+  return (
+    <div
+      className={cn(
+        'flex flex-col gap-2 py-[13px] text-[12.5px]',
+        !isLast && 'border-b border-hairline-soft',
+        !row.is_active && 'opacity-55',
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <span className="truncate font-semibold text-ink">{row.description}</span>
+          <span className="truncate text-[10.5px] text-ink-muted">
+            {row.is_active
+              ? row.ends_on
+                ? `até ${formatDayMonth(row.ends_on)}`
+                : 'sem prazo'
+              : 'pausada'}
+            {' · '}
+            {row.schedule_label}
+          </span>
+        </div>
+
+        <div className="flex shrink-0 items-start gap-1.5">
+          <div className="flex flex-col items-end gap-0.5">
+            <Money
+              value={row.amount}
+              className={cn(
+                'text-[13px] font-semibold',
+                row.type === 'receita' ? 'text-green-bright' : 'text-[#FF9E5C]',
+                isPrivate && 'privacy-blur',
+              )}
+            />
+            {row.occurrences > 1 ? (
+              <span className="text-[10px] font-medium text-ink-muted">
+                ×{row.occurrences} no mês
+              </span>
+            ) : null}
+          </div>
+
+          <RowMenu
+            row={row}
+            isLaunching={isLaunching}
+            onLaunch={onLaunch}
+            onEdit={onEdit}
+            onToggle={onToggle}
+            onDelete={onDelete}
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-1.5">
+        {row.category ? (
+          <span
+            className="inline-block max-w-full truncate rounded-full px-[9px] py-[3px] text-[11px] font-semibold"
+            style={{ color: row.category.color, background: `${row.category.color}1F` }}
+          >
+            {row.category.name}
+          </span>
+        ) : (
+          <span className="text-[11px] text-ink-muted">Sem categoria</span>
+        )}
+        <MonthStatus row={row} />
+      </div>
+
+      <span className="flex min-w-0 items-center gap-1.5 text-[11.5px] font-medium text-ink-soft">
+        {row.source_kind === 'cartao' ? (
+          <CreditCard className="size-3.5 shrink-0 text-ink-faint" aria-hidden="true" />
+        ) : (
+          <Landmark className="size-3.5 shrink-0 text-ink-faint" aria-hidden="true" />
+        )}
+        <span className="truncate">{row.source}</span>
+      </span>
+    </div>
   )
 }
 

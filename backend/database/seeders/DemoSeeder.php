@@ -454,7 +454,7 @@ class DemoSeeder extends Seeder
             'account_id' => $accounts['inter']->id,
             'name' => 'Reserva de emergência',
             'target_amount' => 60000.00,
-            'current_amount' => 40800.00,
+            'initial_amount' => 40800.00,
             'deadline' => CarbonImmutable::now()->addMonths(10)->toDateString(),
             'is_archived' => false,
         ]);
@@ -464,7 +464,7 @@ class DemoSeeder extends Seeder
             'account_id' => null,
             'name' => 'Troca do carro',
             'target_amount' => 45000.00,
-            'current_amount' => 12500.00,
+            'initial_amount' => 12500.00,
             'deadline' => CarbonImmutable::now()->addMonths(20)->toDateString(),
             'is_archived' => false,
         ]);

@@ -97,6 +97,7 @@ export interface Movement {
 }
 
 export interface BudgetStatus {
+  id: number
   category_id: number
   category: string
   color: string
@@ -105,6 +106,56 @@ export interface BudgetStatus {
   percentage: number
   is_exceeded: boolean
 }
+export interface BudgetRecord { id:number; category_id:number; category:{id:number;name:string;color:string}; reference_month:string; limit_amount:number }
+
+export interface AnnualReportMonth {
+  month: string
+  income: number
+  expense: number
+  balance: number
+  is_forecast: boolean
+}
+
+export interface AnnualCategorySlice {
+  category_id: number | null
+  name: string
+  color: string
+  total: number
+  percentage: number
+}
+
+export interface AnnualReport {
+  year: number
+  months: AnnualReportMonth[]
+  total_income: number
+  total_expense: number
+  balance: number
+  balance_series: number[]
+  category_ranking: AnnualCategorySlice[]
+  previous_year_balance: number | null
+  year_over_year: number | null
+}
+export interface GoalRecord {
+  id: number
+  name: string
+  target_amount: number
+  initial_amount: number
+  current_amount: number
+  progress: number
+  deadline: string | null
+  account_id: number | null
+  is_archived: boolean
+}
+
+export interface GoalContribution {
+  id: number
+  goal_id: number
+  amount: number
+  contributed_at: string
+  /** Null quando o aporte e so um registro manual, sem transferencia por tras. */
+  transaction_id: number | null
+}
+export interface ForecastResult { current_balance:number; months:{month:string;predicted_income:number;predicted_expense:number;committed_amount:number;projected_balance:number;leftover:number;commitment_rate:number;confidence:number}[] }
 
 export type AlertLevel = 'alerta' | 'atencao'
 
@@ -596,4 +647,114 @@ export interface CategoriesPage {
   summary: CategoriesSummary
   categories: CategoryNode[]
   types: EnumOption[]
+}
+
+export type AccountType = 'corrente' | 'poupanca' | 'investimento' | 'carteira'
+
+export type BankKind = 'digital' | 'tradicional' | 'corretora' | 'carteira'
+
+/**
+ * Uma conta na tela de Bancos e contas. `month_in` e `month_out` somam tudo o
+ * que passou pela conta no mês, transferência inclusa — a pergunta aqui é
+ * quanto entrou e saiu da conta, não qual foi o resultado do mês.
+ */
+export interface AccountRow {
+  id: number
+  nickname: string
+  type: AccountType
+  type_label: string
+  bank: { id: number; name: string; color: string }
+  initial_balance: number
+  balance: number
+  month_in: number
+  month_out: number
+  month_net: number
+  /** Todos os lançamentos da conta, para o diálogo de exclusão avisar antes. */
+  movements_count: number
+  last_movement_on: string | null
+  is_active: boolean
+}
+
+export interface BankGroup {
+  id: number
+  name: string
+  color: string
+  kind: BankKind
+  kind_label: string
+  balance: number
+  accounts_count: number
+  cards_count: number
+  accounts: AccountRow[]
+}
+
+export interface AccountsSummary {
+  consolidated_balance: number
+  delta_percent: number | null
+  previous_balance: number
+  month_in: number
+  month_out: number
+  active_count: number
+  archived_count: number
+  banks_count: number
+}
+
+export interface BalancePoint {
+  month: string
+  label: string
+  balance: number
+}
+
+export interface AccountsPage {
+  month: string
+  summary: AccountsSummary
+  banks: BankGroup[]
+  evolution: BalancePoint[]
+}
+
+/** A conta como o formulário a edita. */
+export interface AccountRecord {
+  id: number
+  bank_id: number
+  nickname: string
+  type: AccountType
+  type_label: string
+  initial_balance: number
+  balance: number
+  is_active: boolean
+}
+
+export interface BankRecord {
+  id: number
+  name: string
+  slug: string
+  color: string
+  kind: BankKind
+  kind_label: string
+}
+
+/** Um banco do catálogo pronto. `is_registered` já foi cadastrado por você. */
+export interface CatalogBank {
+  slug: string
+  name: string
+  color: string
+  kind: BankKind
+  kind_label: string
+  is_registered: boolean
+}
+
+export interface AccountOptions {
+  banks: BankRecord[]
+  catalog: CatalogBank[]
+  account_types: EnumOption[]
+  bank_kinds: EnumOption[]
+}
+
+/** O resultado de uma conciliação: o lançamento criado e o saldo depois dele. */
+export interface BalanceAdjustment {
+  transaction_id: number
+  account_id: number
+  amount: number
+  direction: MovementDirection
+  date: string
+  balance: number
 }

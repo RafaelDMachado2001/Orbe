@@ -111,76 +111,93 @@ export function InvoicePanel({ invoice, isRefreshing, isBusy, onPay, onClose, on
           description="Nenhuma compra caiu nesta fatura. Compras a partir do dia de fechamento entram na fatura seguinte."
         />
       ) : (
-        <div role="table" aria-label="Compras da fatura" className="text-[12.5px]">
-          <div
-            role="row"
-            className="grid grid-cols-[74px_minmax(0,1.8fr)_130px_70px_110px] gap-3 border-b border-hairline pb-2.5 text-[10.5px] font-bold uppercase tracking-[0.08em] text-ink-faint"
-          >
-            <span role="columnheader">Compra</span>
-            <span role="columnheader">Descrição</span>
-            <span role="columnheader">Categoria</span>
-            <span role="columnheader">Parcela</span>
-            <span role="columnheader" className="text-right">
-              Valor
-            </span>
+        <>
+          <div className="flex flex-col md:hidden">
+            {invoice.items.map((item, index) => (
+              <InvoiceItemCard
+                key={item.id}
+                item={item}
+                isPrivate={isPrivate}
+                isLast={index === invoice.items.length - 1}
+              />
+            ))}
           </div>
 
-          {invoice.items.map((item, index) => (
+          <div
+            role="table"
+            aria-label="Compras da fatura"
+            className="hidden text-[12.5px] md:block"
+          >
             <div
-              key={item.id}
               role="row"
-              className={cn(
-                'grid grid-cols-[74px_minmax(0,1.8fr)_130px_70px_110px] items-center gap-3 py-[11px]',
-                index < invoice.items.length - 1 && 'border-b border-hairline-soft',
-                item.is_cancelled && 'opacity-50',
-              )}
+              className="grid grid-cols-[74px_minmax(0,1.8fr)_130px_70px_110px] gap-3 border-b border-hairline pb-2.5 text-[10.5px] font-bold uppercase tracking-[0.08em] text-ink-faint"
             >
-              <span role="cell" className="font-mono text-[11.5px] tabular-nums text-ink-soft">
-                {formatDayMonth(item.purchase_date)}
-              </span>
-
-              <span role="cell" className="min-w-0 truncate font-semibold text-ink">
-                {item.description}
-                {item.is_cancelled ? (
-                  <span className="ml-2 rounded bg-white/[0.06] px-1.5 py-px text-[10px] font-bold text-ink-muted">
-                    cancelada
-                  </span>
-                ) : null}
-              </span>
-
-              <span role="cell" className="min-w-0">
-                {item.category ? (
-                  <span
-                    className="inline-block max-w-full truncate rounded-full px-[9px] py-[3px] text-[11px] font-semibold"
-                    style={{ color: item.category.color, background: `${item.category.color}1F` }}
-                  >
-                    {item.category.name}
-                  </span>
-                ) : (
-                  <span className="text-[11px] text-ink-muted">Sem categoria</span>
-                )}
-              </span>
-
-              <span
-                role="cell"
-                className="font-mono text-[11.5px] font-semibold tabular-nums text-ink-soft"
-              >
-                {item.installment}
-              </span>
-
-              <span
-                role="cell"
-                className={cn(
-                  'whitespace-nowrap text-right font-mono text-[13px] font-semibold tabular-nums text-[#FF9E5C]',
-                  item.is_cancelled && 'line-through',
-                  isPrivate && 'privacy-blur',
-                )}
-              >
-                <Money value={item.amount} className="text-[13px]" />
+              <span role="columnheader">Compra</span>
+              <span role="columnheader">Descrição</span>
+              <span role="columnheader">Categoria</span>
+              <span role="columnheader">Parcela</span>
+              <span role="columnheader" className="text-right">
+                Valor
               </span>
             </div>
-          ))}
-        </div>
+
+            {invoice.items.map((item, index) => (
+              <div
+                key={item.id}
+                role="row"
+                className={cn(
+                  'grid grid-cols-[74px_minmax(0,1.8fr)_130px_70px_110px] items-center gap-3 py-[11px]',
+                  index < invoice.items.length - 1 && 'border-b border-hairline-soft',
+                  item.is_cancelled && 'opacity-50',
+                )}
+              >
+                <span role="cell" className="font-mono text-[11.5px] tabular-nums text-ink-soft">
+                  {formatDayMonth(item.purchase_date)}
+                </span>
+
+                <span role="cell" className="min-w-0 truncate font-semibold text-ink">
+                  {item.description}
+                  {item.is_cancelled ? (
+                    <span className="ml-2 rounded bg-white/[0.06] px-1.5 py-px text-[10px] font-bold text-ink-muted">
+                      cancelada
+                    </span>
+                  ) : null}
+                </span>
+
+                <span role="cell" className="min-w-0">
+                  {item.category ? (
+                    <span
+                      className="inline-block max-w-full truncate rounded-full px-[9px] py-[3px] text-[11px] font-semibold"
+                      style={{ color: item.category.color, background: `${item.category.color}1F` }}
+                    >
+                      {item.category.name}
+                    </span>
+                  ) : (
+                    <span className="text-[11px] text-ink-muted">Sem categoria</span>
+                  )}
+                </span>
+
+                <span
+                  role="cell"
+                  className="font-mono text-[11.5px] font-semibold tabular-nums text-ink-soft"
+                >
+                  {item.installment}
+                </span>
+
+                <span
+                  role="cell"
+                  className={cn(
+                    'whitespace-nowrap text-right font-mono text-[13px] font-semibold tabular-nums text-[#FF9E5C]',
+                    item.is_cancelled && 'line-through',
+                    isPrivate && 'privacy-blur',
+                  )}
+                >
+                  <Money value={item.amount} className="text-[13px]" />
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {invoice.payments.length > 0 ? (
@@ -205,6 +222,68 @@ export function InvoicePanel({ invoice, isRefreshing, isBusy, onPay, onClose, on
         </section>
       ) : null}
     </Card>
+  )
+}
+
+function InvoiceItemCard({
+  item,
+  isPrivate,
+  isLast,
+}: {
+  item: InvoiceDetail['items'][number]
+  isPrivate: boolean
+  isLast: boolean
+}) {
+  return (
+    <div
+      className={cn(
+        'flex flex-col gap-1.5 py-[11px] text-[12.5px]',
+        !isLast && 'border-b border-hairline-soft',
+        item.is_cancelled && 'opacity-50',
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <span className="min-w-0 truncate font-semibold text-ink">
+          {item.description}
+          {item.is_cancelled ? (
+            <span className="ml-2 rounded bg-white/[0.06] px-1.5 py-px text-[10px] font-bold text-ink-muted">
+              cancelada
+            </span>
+          ) : null}
+        </span>
+
+        <span
+          className={cn(
+            'shrink-0 whitespace-nowrap font-mono text-[13px] font-semibold tabular-nums text-[#FF9E5C]',
+            item.is_cancelled && 'line-through',
+            isPrivate && 'privacy-blur',
+          )}
+        >
+          <Money value={item.amount} className="text-[13px]" />
+        </span>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+        <span className="font-mono tabular-nums text-ink-muted">
+          {formatDayMonth(item.purchase_date)}
+        </span>
+
+        {item.category ? (
+          <span
+            className="inline-block max-w-full truncate rounded-full px-[9px] py-[3px] font-semibold"
+            style={{ color: item.category.color, background: `${item.category.color}1F` }}
+          >
+            {item.category.name}
+          </span>
+        ) : (
+          <span className="text-ink-muted">Sem categoria</span>
+        )}
+
+        <span className="font-mono font-semibold tabular-nums text-ink-muted">
+          {item.installment}
+        </span>
+      </div>
+    </div>
   )
 }
 

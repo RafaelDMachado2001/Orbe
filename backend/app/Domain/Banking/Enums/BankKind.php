@@ -9,6 +9,7 @@ enum BankKind: string
     case Digital = 'digital';
     case Tradicional = 'tradicional';
     case Corretora = 'corretora';
+    case Carteira = 'carteira';
 
     public function label(): string
     {
@@ -16,6 +17,7 @@ enum BankKind: string
             self::Digital => 'Banco digital',
             self::Tradicional => 'Banco tradicional',
             self::Corretora => 'Corretora',
+            self::Carteira => 'Dinheiro e carteiras',
         };
     }
 }

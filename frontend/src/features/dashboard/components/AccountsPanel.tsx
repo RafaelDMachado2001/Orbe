@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 import { Card, CardHeader } from '@/components/ui/Card'
 import { Money } from '@/components/ui/Money'
@@ -25,18 +26,23 @@ export function AccountsPanel({ accounts }: { accounts: AccountSummary[] }) {
           </div>
         ))}
 
-        <div className="flex items-center gap-[11px] opacity-75">
+        <Link
+          to="/bancos"
+          className="flex items-center gap-[11px] opacity-75 transition-opacity hover:opacity-100"
+        >
           <span className="h-[30px] w-2 shrink-0 rounded bg-[#3C4450]" aria-hidden="true" />
           <div className="flex flex-col gap-0.5">
             <span className="flex items-center gap-1 text-[12.5px] font-semibold">
               <Plus className="size-3" aria-hidden="true" />
-              Cadastrar banco
+              {accounts.length === 0 ? 'Cadastrar banco' : 'Bancos e contas'}
             </span>
             <span className="text-[10.5px] font-medium text-ink-muted">
-              {accounts.length === 0 ? 'Comece pela sua conta principal' : 'Cadastro manual'}
+              {accounts.length === 0
+                ? 'Comece pela sua conta principal'
+                : 'Ver saldos, ajustar e arquivar'}
             </span>
           </div>
-        </div>
+        </Link>
       </div>
     </Card>
   )
