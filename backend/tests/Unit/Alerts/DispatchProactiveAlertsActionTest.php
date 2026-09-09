@@ -12,6 +12,7 @@ use App\Domain\Ledger\Models\Category;
 use App\Domain\Ledger\Models\Transaction;
 use App\Domain\Planning\Models\Budget;
 use App\Domain\Planning\Models\Goal;
+use App\Domain\Planning\Queries\BudgetStatusQuery;
 use App\Models\User;
 use App\Notifications\BudgetNearLimitNotification;
 use App\Notifications\GoalDeadlineAtRiskNotification;
@@ -36,7 +37,7 @@ it('avisa fatura fechada vencendo nos proximos dias', function (): void {
         'paid_amount' => 0,
     ]);
 
-    (new DispatchProactiveAlertsAction(app(\App\Domain\Planning\Queries\BudgetStatusQuery::class)))
+    (new DispatchProactiveAlertsAction(app(BudgetStatusQuery::class)))
         ->handle($this->user, $this->today);
 
     Notification::assertSentTo($this->user, InvoiceDueSoonNotification::class);
@@ -62,7 +63,7 @@ it('nao avisa fatura que vence longe ou ja paga', function (): void {
         'paid_amount' => 300,
     ]);
 
-    (new DispatchProactiveAlertsAction(app(\App\Domain\Planning\Queries\BudgetStatusQuery::class)))
+    (new DispatchProactiveAlertsAction(app(BudgetStatusQuery::class)))
         ->handle($this->user, $this->today);
 
     Notification::assertNothingSent();
@@ -88,7 +89,7 @@ it('avisa orcamento perto do limite', function (): void {
         'paid_date' => $this->today->toDateString(),
     ]);
 
-    (new DispatchProactiveAlertsAction(app(\App\Domain\Planning\Queries\BudgetStatusQuery::class)))
+    (new DispatchProactiveAlertsAction(app(BudgetStatusQuery::class)))
         ->handle($this->user, $this->today);
 
     Notification::assertSentTo($this->user, BudgetNearLimitNotification::class);
@@ -102,7 +103,7 @@ it('avisa meta com prazo apertado e progresso baixo', function (): void {
         'deadline' => $this->today->addDays(10)->toDateString(),
     ]);
 
-    (new DispatchProactiveAlertsAction(app(\App\Domain\Planning\Queries\BudgetStatusQuery::class)))
+    (new DispatchProactiveAlertsAction(app(BudgetStatusQuery::class)))
         ->handle($this->user, $this->today);
 
     Notification::assertSentTo($this->user, GoalDeadlineAtRiskNotification::class);
@@ -116,7 +117,7 @@ it('nao avisa meta com progresso adiantado', function (): void {
         'deadline' => $this->today->addDays(10)->toDateString(),
     ]);
 
-    (new DispatchProactiveAlertsAction(app(\App\Domain\Planning\Queries\BudgetStatusQuery::class)))
+    (new DispatchProactiveAlertsAction(app(BudgetStatusQuery::class)))
         ->handle($this->user, $this->today);
 
     Notification::assertNothingSent();
@@ -130,7 +131,7 @@ it('nunca manda o mesmo alerta duas vezes', function (): void {
         'deadline' => $this->today->addDays(10)->toDateString(),
     ]);
 
-    $action = new DispatchProactiveAlertsAction(app(\App\Domain\Planning\Queries\BudgetStatusQuery::class));
+    $action = new DispatchProactiveAlertsAction(app(BudgetStatusQuery::class));
 
     $firstRun = $action->handle($this->user, $this->today);
     $secondRun = $action->handle($this->user, $this->today->addDay());
