@@ -13,6 +13,7 @@ class BudgetIndexRequest extends FormRequest
         return true;
     }
 
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return ['month' => ['nullable', 'date_format:Y-m']];

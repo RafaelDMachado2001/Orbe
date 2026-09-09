@@ -15,6 +15,7 @@ abstract class WriteBudgetRequest extends FormRequest
         return true;
     }
 
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         $id = $this->user()->id;
