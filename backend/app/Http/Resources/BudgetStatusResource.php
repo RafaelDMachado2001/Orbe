@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Domain\Planning\Queries\BudgetStatusQuery;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @see \App\Domain\Planning\Queries\BudgetStatusQuery */
+/** @see BudgetStatusQuery */
 class BudgetStatusResource extends JsonResource
 {
     /** @return array<string, mixed> */
