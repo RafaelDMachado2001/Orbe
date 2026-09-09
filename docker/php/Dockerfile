@@ -5,17 +5,19 @@ COPY --from=mlocati/php-extension-installer:2 /usr/bin/install-php-extensions /u
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 RUN install-php-extensions \
-        pdo_pgsql \
-        pgsql \
-        redis \
-        bcmath \
-        intl \
-        zip \
-        gd \
-        opcache \
-        pcntl \
+    pdo_pgsql \
+    pgsql \
+    redis \
+    bcmath \
+    intl \
+    zip \
+    gd \
+    opcache \
+    pcntl \
     && apt-get update \
     && apt-get install -y --no-install-recommends git unzip postgresql-client \
+    && apt-get upgrade -y \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Alinha o usuario do container com o usuario do host para evitar arquivos root no bind mount.
