@@ -2,18 +2,18 @@
 
 ## Objetivo do projeto
 
-O Orbe é uma aplicação web de gestão financeira pessoal. Seu objetivo é centralizar contas, bancos, cartões, lançamentos, categorias, metas, orçamentos, importações e relatórios em uma única interface, com previsão de fluxo de caixa e alertas operacionais.
+Meu objetivo com o Orbe é oferecer uma aplicação web de gestão financeira pessoal que ajude você a centralizar contas, bancos, cartões, lançamentos, categorias, metas, orçamentos, importações e relatórios em uma única interface. Você também pode acompanhar previsões de fluxo de caixa e alertas operacionais.
 
 ## Arquitetura do projeto
 
-O projeto é organizado em dois módulos principais e executado por serviços Docker:
+Eu organizei o projeto em dois módulos principais e serviços Docker para que você possa executar a aplicação de forma consistente:
 
-- `frontend/`: aplicação React com Vite e TypeScript, responsável pela interface, navegação, autenticação e consumo da API.
+- `frontend/`: aplicação React com Vite e TypeScript. Aqui você encontra a interface, a navegação, a autenticação e o consumo da API.
 - `backend/`: API Laravel organizada por domínios de negócio, com autenticação via Sanctum, persistência, filas, comandos agendados e testes automatizados.
 - `docker/`: imagens e configurações dos containers PHP, Node.js, Nginx e inicialização do banco.
-- `docker-compose.yml`: orquestra API, frontend, Nginx, PostgreSQL e Redis.
+- `docker-compose.yml`: arquivo que uso para orquestrar API, frontend, Nginx, PostgreSQL e Redis.
 
-O fluxo principal é: navegador → frontend React → Nginx → API Laravel → PostgreSQL/Redis. Filas e agendamentos são processados por workers separados do serviço principal da API.
+Quando você acessa a aplicação, o fluxo principal é: navegador → frontend React → Nginx → API Laravel → PostgreSQL/Redis. Filas e agendamentos são processados por workers separados do serviço principal da API.
 
 ## Tecnologias utilizadas
 
@@ -23,7 +23,7 @@ O fluxo principal é: navegador → frontend React → Nginx → API Laravel →
 
 ### Execução por sistema operacional
 
-Pré-requisitos: Docker Desktop (Windows/macOS) ou Docker Engine + Docker Compose (Linux).
+Para começar, você precisa do Docker Desktop (Windows/macOS) ou do Docker Engine + Docker Compose (Linux).
 
 Linux e macOS:
 
@@ -39,4 +39,4 @@ Copy-Item .env.example .env
 docker compose up -d --build
 ```
 
-Windows também pode usar os comandos Linux pelo Git Bash ou WSL. A aplicação ficará disponível em `http://localhost:5173` e a API em `http://localhost:8000`.
+Se você usa Windows, também pode executar os comandos Linux pelo Git Bash ou WSL. Depois de subir os containers, acesse a aplicação em `http://localhost:5173` e a API em `http://localhost:8000`.
