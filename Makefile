@@ -4,37 +4,50 @@ API := $(DC) exec -T api
 .DEFAULT_GOAL := help
 
 .PHONY: help
-help: ## Lista os comandos disponiveis
-	@grep -hE '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
-		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
+help: ## Lista os comandos disponíveis
+	@echo "Comandos disponíveis:"
+	@echo "  setup       Cria o .env quando necessário, constrói e sobe os serviços"
+	@echo "  up          Sobe os serviços"
+	@echo "  down        Para os serviços, mantendo os volumes"
+	@echo "  build       Reconstrói as imagens sem cache"
+	@echo "  ps          Mostra o status dos serviços"
+	@echo "  logs        Acompanha os logs"
+	@echo "  shell       Abre um shell na API"
+	@echo "  web-shell   Abre um shell no frontend"
+	@echo "  migrate     Executa as migrations"
+	@echo "  fresh       Recria o banco e executa o seeder"
+	@echo "  seed        Executa apenas o seeder"
+	@echo "  test        Executa os testes PHP"
+	@echo "  pint        Formata o PHP"
+	@echo "  stan        Executa a análise estática"
+	@echo "  tsc         Verifica os tipos do frontend"
+	@echo "  lint        Executa o ESLint"
+	@echo "  check       Executa a esteira de qualidade"
+	@echo "  artisan     Executa um comando Artisan (ex.: make artisan cmd=route:list)"
 
 .PHONY: setup
-setup: ## Primeira execucao: copia .env, sobe tudo e popula a base
-	@test -f .env || cp .env.example .env
-	@sed -i "s/^UID=.*/UID=$$(stat -c '%u' .)/; s/^GID=.*/GID=$$(stat -c '%g' .)/" .env
-	$(DC) build
-	$(DC) up -d
-	@echo "\n  API  -> http://localhost:8000/api/v1"
-	@echo "  Web  -> http://localhost:5173\n"
+setup: ## Cria o .env quando necessário, constrói e sobe os serviços
+	$(ENV_SETUP)
+	$(DC) up -d --build
 
 .PHONY: up
-up: ## Sobe todos os servicos
+up: ## Sobe todos os serviços
 	$(DC) up -d
 
 .PHONY: down
-down: ## Derruba os servicos (mantem os volumes)
+down: ## Para os serviços, mantendo os volumes
 	$(DC) down
 
 .PHONY: build
-build: ## Reconstroi as imagens
+build: ## Reconstrói as imagens sem cache
 	$(DC) build --no-cache
 
 .PHONY: ps
-ps: ## Status dos servicos
+ps: ## Mostra o status dos serviços
 	$(DC) ps
 
 .PHONY: logs
-logs: ## Segue o log de todos os servicos
+logs: ## Acompanha os logs de todos os serviços
 	$(DC) logs -f --tail=100
 
 .PHONY: shell
@@ -46,40 +59,46 @@ web-shell: ## Abre um shell no container do frontend
 	$(DC) exec web sh
 
 .PHONY: migrate
-migrate: ## Roda as migrations pendentes
+migrate: ## Executa as migrations pendentes
 	$(API) php artisan migrate --force
 
 .PHONY: fresh
-fresh: ## Recria a base do zero e roda o seeder de demonstracao
+fresh: ## Recria o banco e executa o seeder
 	$(API) php artisan migrate:fresh --seed --force
 
 .PHONY: seed
-seed: ## Roda apenas o seeder
+seed: ## Executa apenas o seeder
 	$(API) php artisan db:seed --force
 
 .PHONY: test
-test: ## Roda a suite de testes (Pest)
+test: ## Executa os testes PHP
 	$(API) php artisan test
 
 .PHONY: pint
-pint: ## Formata o codigo PHP
+pint: ## Formata o código PHP
 	$(API) ./vendor/bin/pint
 
 .PHONY: stan
-stan: ## Analise estatica (PHPStan/Larastan)
+stan: ## Executa a análise estática
 	$(API) ./vendor/bin/phpstan analyse --memory-limit=1G
 
 .PHONY: tsc
-tsc: ## Checagem de tipos do frontend
+tsc: ## Verifica os tipos do frontend
 	$(DC) exec -T web npx tsc --noEmit
 
 .PHONY: lint
-lint: ## ESLint no frontend
+lint: ## Executa o ESLint no frontend
 	$(DC) exec -T web npm run lint
 
 .PHONY: check
-check: pint stan test tsc lint ## Roda toda a esteira de qualidade
+check: pint stan test tsc lint ## Executa a esteira de qualidade
 
 .PHONY: artisan
-artisan: ## Executa um comando artisan: make artisan cmd="route:list"
+artisan: ## Executa um comando Artisan
 	$(API) php artisan $(cmd)
+
+ifeq ($(OS),Windows_NT)
+ENV_SETUP = powershell -NoProfile -Command "if (!(Test-Path .env)) { Copy-Item .env.example .env }"
+else
+ENV_SETUP = test -f .env || cp .env.example .env
+endif
